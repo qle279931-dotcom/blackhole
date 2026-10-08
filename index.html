@@ -55,7 +55,11 @@
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 
+  <!-- B7 - nạp OrbitControls -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
   <script>
+
     const khung = document.getElementById('khung');
     const scene = new THREE.Scene();
 
@@ -66,7 +70,6 @@
       2000
     );
 
-    // B4 - đổi vị trí camera
     camera.position.set(0, 120, 230);
     camera.lookAt(0, -30, 0);
 
@@ -83,9 +86,47 @@
     khung.appendChild(renderer.domElement);
 
 
-    // B4 - sửa hàm doCao
+    // =========================
+    // B7 - ĐIỀU KHIỂN 3D
+    // =========================
+
+    const dieuKhien = new THREE.OrbitControls(
+      camera,
+      renderer.domElement
+    );
+
+    dieuKhien.target.set(0, -30, 0);
+    dieuKhien.enableDamping = true;
+    dieuKhien.autoRotate = true;
+    dieuKhien.autoRotateSpeed = 0.8;
+    dieuKhien.minDistance = 120;
+    dieuKhien.maxDistance = 500;
+
+
+    // B7 - thay đổi kích thước màn hình
+    window.addEventListener('resize', () => {
+
+      camera.aspect =
+        khung.clientWidth / khung.clientHeight;
+
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(
+        khung.clientWidth,
+        khung.clientHeight
+      );
+
+    });
+
+
+    // =========================
+    // B4 - ĐỘ CONG KHÔNG-THỜI GIAN
+    // =========================
+
     function doCao(r) {
-      return -80 * Math.exp(-(r / 45) * (r / 45));
+      return -80 * Math.exp(
+        -(r / 45) * (r / 45)
+      );
     }
 
     const matLuoi = new THREE.LineBasicMaterial({
@@ -95,7 +136,7 @@
     const BAN_KINH = 100;
 
 
-    // B4 - lưới dày hơn
+    // Lưới dày hơn
     for (let r = 20; r <= BAN_KINH; r += 10) {
 
       const diem = [];
@@ -111,6 +152,7 @@
             r * Math.sin(goc)
           )
         );
+
       }
 
       const hinh =
@@ -119,6 +161,7 @@
       scene.add(
         new THREE.Line(hinh, matLuoi)
       );
+
     }
 
 
@@ -137,6 +180,7 @@
             r * Math.sin(goc)
           )
         );
+
       }
 
       const hinh =
@@ -145,10 +189,14 @@
       scene.add(
         new THREE.Line(hinh, matLuoi)
       );
+
     }
 
 
-    // B3 - hố đen
+    // =========================
+    // B3 - HỐ ĐEN
+    // =========================
+
     const RB = 15;
 
     const hoDen = new THREE.Mesh(
@@ -158,7 +206,6 @@
       })
     );
 
-    // B4 - hạ hố đen xuống đáy chỗ lõm
     hoDen.position.set(
       0,
       doCao(0) + RB,
@@ -168,9 +215,14 @@
     scene.add(hoDen);
 
 
-    // B3 - vòng chân trời sự kiện
+    // Vòng chân trời sự kiện
     const vong = new THREE.Mesh(
-      new THREE.TorusGeometry(22, 1.5, 16, 64),
+      new THREE.TorusGeometry(
+        22,
+        1.5,
+        16,
+        64
+      ),
       new THREE.MeshBasicMaterial({
         color: 0xffb347
       })
@@ -178,7 +230,6 @@
 
     vong.rotation.x = Math.PI / 2;
 
-    // B4 - hạ vòng xuống đáy chỗ lõm
     vong.position.set(
       0,
       doCao(0) + RB,
@@ -189,17 +240,20 @@
 
 
     // =========================
-    // B5 - TẠO CÁC TIA ÁNH SÁNG
+    // B5 - CÁC TIA ÁNH SÁNG
     // =========================
 
     function taoTia(b, K, mau) {
+
       let x = -110, z = b;
       let vx = 1, vz = 0;
+
       const diem = [];
 
       for (let i = 0; i < 400; i++) {
 
-        const r = Math.sqrt(x * x + z * z);
+        const r =
+          Math.sqrt(x * x + z * z);
 
         if (
           r < RB + 5 ||
@@ -229,6 +283,7 @@
 
         x += vx * 1.2;
         z += vz * 1.2;
+
       }
 
       const duong =
@@ -249,6 +304,7 @@
       scene.add(ong);
 
       return duong;
+
     }
 
 
@@ -260,28 +316,37 @@
 
 
     // =========================
-    // B6 - HẠT SÁNG CHẠY TRÊN TIA
+    // B6 - HẠT SÁNG CHẠY
     // =========================
 
-    const hat = duongTia.map(() => new THREE.Mesh(
-      new THREE.SphereGeometry(2.5, 12, 12),
-      new THREE.MeshBasicMaterial({
-        color: 0xffffff
-      })
-    ));
+    const hat = duongTia.map(() =>
+      new THREE.Mesh(
+        new THREE.SphereGeometry(
+          2.5,
+          12,
+          12
+        ),
+        new THREE.MeshBasicMaterial({
+          color: 0xffffff
+        })
+      )
+    );
 
     hat.forEach(h => scene.add(h));
 
 
     function chay() {
+
       requestAnimationFrame(chay);
 
-      const t = performance.now() / 1000;
+      const t =
+        performance.now() / 1000;
 
       hat.forEach((h, i) => {
 
         const tienDo =
-          (t * (0.12 + i * 0.02) + i * 0.3) % 1;
+          (t * (0.12 + i * 0.02) +
+          i * 0.3) % 1;
 
         h.position.copy(
           duongTia[i].getPointAt(tienDo)
@@ -289,10 +354,16 @@
 
       });
 
+
+      // B7 - cập nhật điều khiển
+      dieuKhien.update();
+
+
       renderer.render(
         scene,
         camera
       );
+
     }
 
     chay();
