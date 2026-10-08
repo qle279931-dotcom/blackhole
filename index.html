@@ -40,6 +40,22 @@
       align-items: center;
       justify-content: center;
       color: #8d9bb0;
+      overflow: hidden;
+    }
+
+    .nhan {
+      position: absolute;
+      left: 0;
+      top: 0;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: bold;
+      color: #e8eef5;
+      background: rgba(5, 7, 13, 0.8);
+      border: 1px solid #2a3550;
+      border-radius: 4px;
+      padding: 3px 7px;
+      pointer-events: none;
     }
   </style>
 </head>
@@ -48,18 +64,15 @@
 
   <header>
     <h1>BLACK HOLE 3D</h1>
-    <p>Mô phỏng độ cong không–thời gian quanh hố đen</p>
+    <p>Mô phỏng độ cong không–thời gian quanh hố đen · Tác giả: Lê Quỳnh Anh · Kéo chuột để xoay, cuộn để phóng to</p>
   </header>
 
   <div id="khung">Khu vực mô hình 3D sẽ hiện ở đây</div>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
-
-  <!-- B7 - nạp OrbitControls -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
   <script>
-
     const khung = document.getElementById('khung');
     const scene = new THREE.Scene();
 
@@ -73,23 +86,12 @@
     camera.position.set(0, 120, 230);
     camera.lookAt(0, -30, 0);
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true
-    });
-
-    renderer.setSize(
-      khung.clientWidth,
-      khung.clientHeight
-    );
-
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(khung.clientWidth, khung.clientHeight);
     renderer.setClearColor(0x05070d);
     khung.appendChild(renderer.domElement);
 
-
-    // =========================
-    // B7 - ĐIỀU KHIỂN 3D
-    // =========================
-
+    // B7 - Điều khiển camera
     const dieuKhien = new THREE.OrbitControls(
       camera,
       renderer.domElement
@@ -102,10 +104,7 @@
     dieuKhien.minDistance = 120;
     dieuKhien.maxDistance = 500;
 
-
-    // B7 - thay đổi kích thước màn hình
     window.addEventListener('resize', () => {
-
       camera.aspect =
         khung.clientWidth / khung.clientHeight;
 
@@ -115,18 +114,11 @@
         khung.clientWidth,
         khung.clientHeight
       );
-
     });
 
-
-    // =========================
-    // B4 - ĐỘ CONG KHÔNG-THỜI GIAN
-    // =========================
-
+    // B4 - Độ cao của lưới
     function doCao(r) {
-      return -80 * Math.exp(
-        -(r / 45) * (r / 45)
-      );
+      return -80 * Math.exp(-(r / 45) * (r / 45));
     }
 
     const matLuoi = new THREE.LineBasicMaterial({
@@ -135,14 +127,11 @@
 
     const BAN_KINH = 100;
 
-
-    // Lưới dày hơn
+    // Các vòng tròn đồng tâm
     for (let r = 20; r <= BAN_KINH; r += 10) {
-
       const diem = [];
 
       for (let i = 0; i <= 100; i++) {
-
         const goc = (i / 100) * Math.PI * 2;
 
         diem.push(
@@ -152,27 +141,20 @@
             r * Math.sin(goc)
           )
         );
-
       }
 
       const hinh =
         new THREE.BufferGeometry().setFromPoints(diem);
 
-      scene.add(
-        new THREE.Line(hinh, matLuoi)
-      );
-
+      scene.add(new THREE.Line(hinh, matLuoi));
     }
-
 
     // Các đường tỏa ra từ tâm
     for (let k = 0; k < 24; k++) {
-
       const goc = (k / 24) * Math.PI * 2;
       const diem = [];
 
       for (let r = 0; r <= BAN_KINH; r += 5) {
-
         diem.push(
           new THREE.Vector3(
             r * Math.cos(goc),
@@ -180,23 +162,15 @@
             r * Math.sin(goc)
           )
         );
-
       }
 
       const hinh =
         new THREE.BufferGeometry().setFromPoints(diem);
 
-      scene.add(
-        new THREE.Line(hinh, matLuoi)
-      );
-
+      scene.add(new THREE.Line(hinh, matLuoi));
     }
 
-
-    // =========================
-    // B3 - HỐ ĐEN
-    // =========================
-
+    // B3 - Hố đen
     const RB = 15;
 
     const hoDen = new THREE.Mesh(
@@ -214,15 +188,9 @@
 
     scene.add(hoDen);
 
-
-    // Vòng chân trời sự kiện
+    // Chân trời sự kiện
     const vong = new THREE.Mesh(
-      new THREE.TorusGeometry(
-        22,
-        1.5,
-        16,
-        64
-      ),
+      new THREE.TorusGeometry(22, 1.5, 16, 64),
       new THREE.MeshBasicMaterial({
         color: 0xffb347
       })
@@ -238,22 +206,19 @@
 
     scene.add(vong);
 
-
-    // =========================
-    // B5 - CÁC TIA ÁNH SÁNG
-    // =========================
-
+    // B5 - Tạo tia sáng
     function taoTia(b, K, mau) {
+      let x = -110;
+      let z = b;
 
-      let x = -110, z = b;
-      let vx = 1, vz = 0;
+      let vx = 1;
+      let vz = 0;
 
       const diem = [];
 
       for (let i = 0; i < 400; i++) {
 
-        const r =
-          Math.sqrt(x * x + z * z);
+        const r = Math.sqrt(x * x + z * z);
 
         if (
           r < RB + 5 ||
@@ -283,7 +248,6 @@
 
         x += vx * 1.2;
         z += vz * 1.2;
-
       }
 
       const duong =
@@ -304,9 +268,7 @@
       scene.add(ong);
 
       return duong;
-
     }
-
 
     const duongTia = [
       taoTia(80, 12, 0xffe08a),
@@ -314,11 +276,103 @@
       taoTia(40, 12, 0xff7a59)
     ];
 
+    // B8 - Nhãn chú thích
+    const nhan = [];
 
-    // =========================
-    // B6 - HẠT SÁNG CHẠY
-    // =========================
+    function themNhan(chu, viTri, mau) {
+      const e = document.createElement('div');
 
+      e.className = 'nhan';
+      e.textContent = chu;
+
+      if (mau) {
+        e.style.color = mau;
+      }
+
+      khung.appendChild(e);
+
+      nhan.push({
+        e: e,
+        viTri: viTri
+      });
+    }
+
+    themNhan(
+      'HỐ ĐEN',
+      new THREE.Vector3(
+        0,
+        doCao(0) + RB + 12,
+        0
+      )
+    );
+
+    themNhan(
+      'CHÂN TRỜI SỰ KIỆN',
+      new THREE.Vector3(
+        15.5,
+        doCao(0) + RB,
+        15.5
+      )
+    );
+
+    themNhan(
+      'ĐỘ CONG KHÔNG–THỜI GIAN',
+      new THREE.Vector3(
+        -32,
+        doCao(45),
+        32
+      )
+    );
+
+    themNhan(
+      'QUỸ ĐẠO ÁNH SÁNG',
+      duongTia[0].getPointAt(0.1)
+    );
+
+    themNhan(
+      'TIA SÁNG XA',
+      duongTia[0].getPointAt(0.6),
+      '#ffe08a'
+    );
+
+    themNhan(
+      'TIA SÁNG TRUNG BÌNH',
+      duongTia[1].getPointAt(0.6),
+      '#ffb347'
+    );
+
+    themNhan(
+      'TIA SÁNG GẦN',
+      duongTia[2].getPointAt(0.6),
+      '#ff7a59'
+    );
+
+    const v = new THREE.Vector3();
+
+    function capNhatNhan() {
+
+      nhan.forEach(n => {
+
+        v.copy(n.viTri).project(camera);
+
+        const x =
+          (v.x * 0.5 + 0.5) *
+          khung.clientWidth;
+
+        const y =
+          (-v.y * 0.5 + 0.5) *
+          khung.clientHeight;
+
+        n.e.style.transform =
+          'translate(' +
+          x +
+          'px,' +
+          y +
+          'px) translate(-50%,-120%)';
+      });
+    }
+
+    // B6 - Hạt sáng chuyển động
     const hat = duongTia.map(() =>
       new THREE.Mesh(
         new THREE.SphereGeometry(
@@ -332,8 +386,9 @@
       )
     );
 
-    hat.forEach(h => scene.add(h));
-
+    hat.forEach(h =>
+      scene.add(h)
+    );
 
     function chay() {
 
@@ -345,29 +400,29 @@
       hat.forEach((h, i) => {
 
         const tienDo =
-          (t * (0.12 + i * 0.02) +
-          i * 0.3) % 1;
+          (
+            t * (0.12 + i * 0.02)
+            + i * 0.3
+          ) % 1;
 
         h.position.copy(
           duongTia[i].getPointAt(tienDo)
         );
-
       });
 
+      // B8 - Cập nhật vị trí nhãn
+      capNhatNhan();
 
-      // B7 - cập nhật điều khiển
+      // B7 - Cập nhật điều khiển
       dieuKhien.update();
-
 
       renderer.render(
         scene,
         camera
       );
-
     }
 
     chay();
-
   </script>
 
 </body>
