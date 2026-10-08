@@ -88,7 +88,6 @@
       return -80 * Math.exp(-(r / 45) * (r / 45));
     }
 
-
     const matLuoi = new THREE.LineBasicMaterial({
       color: 0x6fa8c7
     });
@@ -149,7 +148,7 @@
     }
 
 
-    // B3 - tạo hố đen
+    // B3 - hố đen
     const RB = 15;
 
     const hoDen = new THREE.Mesh(
@@ -169,7 +168,7 @@
     scene.add(hoDen);
 
 
-    // B3 - tạo vòng chân trời sự kiện
+    // B3 - vòng chân trời sự kiện
     const vong = new THREE.Mesh(
       new THREE.TorusGeometry(22, 1.5, 16, 64),
       new THREE.MeshBasicMaterial({
@@ -194,8 +193,8 @@
     // =========================
 
     function taoTia(b, K, mau) {
-      let x = -110, z = b;     // vị trí xuất phát
-      let vx = 1, vz = 0;      // hướng bay: sang phải
+      let x = -110, z = b;
+      let vx = 1, vz = 0;
       const diem = [];
 
       for (let i = 0; i < 400; i++) {
@@ -254,17 +253,49 @@
 
 
     const duongTia = [
-      taoTia(80, 12, 0xffe08a),  // tia xa
-      taoTia(60, 12, 0xffb347),  // tia trung bình
-      taoTia(40, 12, 0xff7a59)   // tia gần
+      taoTia(80, 12, 0xffe08a),
+      taoTia(60, 12, 0xffb347),
+      taoTia(40, 12, 0xff7a59)
     ];
 
 
     // =========================
-    // VẼ MÔ HÌNH
+    // B6 - HẠT SÁNG CHẠY TRÊN TIA
     // =========================
 
-    renderer.render(scene, camera);
+    const hat = duongTia.map(() => new THREE.Mesh(
+      new THREE.SphereGeometry(2.5, 12, 12),
+      new THREE.MeshBasicMaterial({
+        color: 0xffffff
+      })
+    ));
+
+    hat.forEach(h => scene.add(h));
+
+
+    function chay() {
+      requestAnimationFrame(chay);
+
+      const t = performance.now() / 1000;
+
+      hat.forEach((h, i) => {
+
+        const tienDo =
+          (t * (0.12 + i * 0.02) + i * 0.3) % 1;
+
+        h.position.copy(
+          duongTia[i].getPointAt(tienDo)
+        );
+
+      });
+
+      renderer.render(
+        scene,
+        camera
+      );
+    }
+
+    chay();
 
   </script>
 
