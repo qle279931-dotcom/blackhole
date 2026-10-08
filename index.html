@@ -4,83 +4,225 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BLACK HOLE 3D</title>
+
   <style>
-    html, body { height: 100%; margin: 0; background: #05070d;
-      color: #e8eef5; font-family: Arial, sans-serif; }
-    header { padding: 16px; }
-    h1 { margin: 0; font-size: 28px; }
-    p { margin: 4px 0 0; color: #8d9bb0; }
-    #khung { position: absolute; left: 16px; right: 16px;
-      top: 90px; bottom: 16px; border: 2px dashed #2a3550;
-      border-radius: 8px; display: flex; align-items: center;
-      justify-content: center; color: #8d9bb0; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #05070d;
+      color: #e8eef5;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      padding: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    p {
+      margin: 4px 0 0;
+      color: #8d9bb0;
+    }
+
+    #khung {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      top: 90px;
+      bottom: 16px;
+      border: 2px dashed #2a3550;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8d9bb0;
+    }
   </style>
 </head>
+
 <body>
+
   <header>
     <h1>BLACK HOLE 3D</h1>
     <p>Mô phỏng độ cong không–thời gian quanh hố đen</p>
   </header>
+
   <div id="khung">Khu vực mô hình 3D sẽ hiện ở đây</div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+
+  <script>
+
+    const khung = document.getElementById('khung');
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(
+      45,
+      khung.clientWidth / khung.clientHeight,
+      1,
+      2000
+    );
+
+    camera.position.set(0, 150, 250);
+    camera.lookAt(0, 0, 0);
+
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true
+    });
+
+    renderer.setSize(
+      khung.clientWidth,
+      khung.clientHeight
+    );
+
+    renderer.setClearColor(0x05070d);
+    khung.appendChild(renderer.domElement);
+
+
+    // =========================
+    // B3 - ĐỘ CONG KHÔNG-THỜI GIAN
+    // =========================
+
+    function doCao(r) {
+      return -80 * Math.exp(
+        -(r / 45) * (r / 45)
+      );
+    }
+
+
+    const matLuoi = new THREE.LineBasicMaterial({
+      color: 0x6fa8c7
+    });
+
+    const BAN_KINH = 100;
+
+
+    // Các vòng tròn đồng tâm
+    for (let r = 20; r <= BAN_KINH; r += 20) {
+
+      const diem = [];
+
+      for (let i = 0; i <= 100; i++) {
+
+        const goc = (i / 100) * Math.PI * 2;
+
+        diem.push(
+          new THREE.Vector3(
+            r * Math.cos(goc),
+            doCao(r),
+            r * Math.sin(goc)
+          )
+        );
+
+      }
+
+      const hinh =
+        new THREE.BufferGeometry().setFromPoints(diem);
+
+      scene.add(
+        new THREE.Line(hinh, matLuoi)
+      );
+    }
+
+
+    // Các đường tỏa ra từ tâm
+    for (let k = 0; k < 24; k++) {
+
+      const goc = (k / 24) * Math.PI * 2;
+      const diem = [];
+
+      for (let r = 0; r <= BAN_KINH; r += 5) {
+
+        diem.push(
+          new THREE.Vector3(
+            r * Math.cos(goc),
+            doCao(r),
+            r * Math.sin(goc)
+          )
+        );
+
+      }
+
+      const hinh =
+        new THREE.BufferGeometry().setFromPoints(diem);
+
+      scene.add(
+        new THREE.Line(hinh, matLuoi)
+      );
+    }
+
+
+    // =========================
+    // B2 - HỐ ĐEN
+    // =========================
+
+    const RB = 15;
+
+    const hoDen = new THREE.Mesh(
+      new THREE.SphereGeometry(
+        RB,
+        32,
+        24
+      ),
+
+      new THREE.MeshBasicMaterial({
+        color: 0x000000
+      })
+    );
+
+    hoDen.position.set(
+      0,
+      0,
+      0
+    );
+
+    scene.add(hoDen);
+
+
+    // =========================
+    // B2 - VÒNG CHÂN TRỜI SỰ KIỆN
+    // =========================
+
+    const vong = new THREE.Mesh(
+
+      new THREE.TorusGeometry(
+        22,
+        1.5,
+        16,
+        64
+      ),
+
+      new THREE.MeshBasicMaterial({
+        color: 0xffb347
+      })
+    );
+
+    vong.rotation.x = Math.PI / 2;
+
+    vong.position.set(
+      0,
+      0,
+      0
+    );
+
+    scene.add(vong);
+
+
+    // =========================
+    // VẼ MÔ HÌNH
+    // =========================
+
+    renderer.render(
+      scene,
+      camera
+    );
+
+  </script>
+
 </body>
 </html>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
-<script>
-  const khung = document.getElementById('khung');
-  const scene = new THREE.Scene();
-
-  const camera = new THREE.PerspectiveCamera(
-    45, khung.clientWidth / khung.clientHeight, 1, 2000);
-  camera.position.set(0, 150, 250);
-  camera.lookAt(0, 0, 0);
-
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(khung.clientWidth, khung.clientHeight);
-  renderer.setClearColor(0x05070d);
-  khung.appendChild(renderer.domElement);
-
-  // Độ cao của lưới (lúc này lưới phẳng)
-  function doCao(r) { return 0; }
-
-  const matLuoi = new THREE.LineBasicMaterial({ color: 0x6fa8c7 });
-  const BAN_KINH = 100;
-
-  // Các vòng tròn đồng tâm
-  for (let r = 20; r <= BAN_KINH; r += 20) {
-    const diem = [];
-    for (let i = 0; i <= 100; i++) {
-      const goc = (i / 100) * Math.PI * 2;
-      diem.push(new THREE.Vector3(
-        r * Math.cos(goc), doCao(r), r * Math.sin(goc)));
-    }
-    const hinh = new THREE.BufferGeometry().setFromPoints(diem);
-    scene.add(new THREE.Line(hinh, matLuoi));
-  }
-
-  // Các đường tỏa ra từ tâm
-  for (let k = 0; k < 24; k++) {
-    const goc = (k / 24) * Math.PI * 2;
-    const diem = [];
-    for (let r = 0; r <= BAN_KINH; r += 5) {
-      diem.push(new THREE.Vector3(
-        r * Math.cos(goc), doCao(r), r * Math.sin(goc)));
-    }
-    const hinh = new THREE.BufferGeometry().setFromPoints(diem);
-    scene.add(new THREE.Line(hinh, matLuoi));
-  }
-
-  // --- 4. Vẽ lên màn hình ---
-  renderer.render(scene, camera);
-const RB = 15;  // bán kính hố đen
-const hoDen = new THREE.Mesh(
-  new THREE.SphereGeometry(RB, 32, 24),
-  new THREE.MeshBasicMaterial({ color: 0x000000 }));
-hoDen.position.set(0, 0, 0);
-scene.add(hoDen);
-
-const vong = new THREE.Mesh(
-  new THREE.TorusGeometry(22, 1.5, 16, 64),
-  new THREE.MeshBasicMaterial({ color: 0xffb347 }));
-vong.rotation.x = Math.PI / 2;
-vong.position.set(0, 0, 0);
-scene.add(vong);
