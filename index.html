@@ -53,11 +53,9 @@
 
   <div id="khung">Khu vực mô hình 3D sẽ hiện ở đây</div>
 
-
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 
   <script>
-
     const khung = document.getElementById('khung');
     const scene = new THREE.Scene();
 
@@ -68,8 +66,9 @@
       2000
     );
 
-    camera.position.set(0, 150, 250);
-    camera.lookAt(0, 0, 0);
+    // B4 - đổi vị trí camera
+    camera.position.set(0, 120, 230);
+    camera.lookAt(0, -30, 0);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true
@@ -84,14 +83,9 @@
     khung.appendChild(renderer.domElement);
 
 
-    // =========================
-    // B3 - ĐỘ CONG KHÔNG-THỜI GIAN
-    // =========================
-
+    // B4 - sửa hàm doCao
     function doCao(r) {
-      return -80 * Math.exp(
-        -(r / 45) * (r / 45)
-      );
+      return -80 * Math.exp(-(r / 45) * (r / 45));
     }
 
 
@@ -102,8 +96,8 @@
     const BAN_KINH = 100;
 
 
-    // Các vòng tròn đồng tâm
-    for (let r = 20; r <= BAN_KINH; r += 20) {
+    // B4 - lưới dày hơn
+    for (let r = 20; r <= BAN_KINH; r += 10) {
 
       const diem = [];
 
@@ -118,7 +112,6 @@
             r * Math.sin(goc)
           )
         );
-
       }
 
       const hinh =
@@ -145,7 +138,6 @@
             r * Math.sin(goc)
           )
         );
-
       }
 
       const hinh =
@@ -157,46 +149,29 @@
     }
 
 
-    // =========================
-    // B2 - HỐ ĐEN
-    // =========================
-
+    // B3 - tạo hố đen
     const RB = 15;
 
     const hoDen = new THREE.Mesh(
-      new THREE.SphereGeometry(
-        RB,
-        32,
-        24
-      ),
-
+      new THREE.SphereGeometry(RB, 32, 24),
       new THREE.MeshBasicMaterial({
         color: 0x000000
       })
     );
 
+    // B4 - hạ hố đen xuống đáy chỗ lõm
     hoDen.position.set(
       0,
-      0,
+      doCao(0) + RB,
       0
     );
 
     scene.add(hoDen);
 
 
-    // =========================
-    // B2 - VÒNG CHÂN TRỜI SỰ KIỆN
-    // =========================
-
+    // B3 - tạo vòng chân trời sự kiện
     const vong = new THREE.Mesh(
-
-      new THREE.TorusGeometry(
-        22,
-        1.5,
-        16,
-        64
-      ),
-
+      new THREE.TorusGeometry(22, 1.5, 16, 64),
       new THREE.MeshBasicMaterial({
         color: 0xffb347
       })
@@ -204,23 +179,18 @@
 
     vong.rotation.x = Math.PI / 2;
 
+    // B4 - hạ vòng xuống đáy chỗ lõm
     vong.position.set(
       0,
-      0,
+      doCao(0) + RB,
       0
     );
 
     scene.add(vong);
 
 
-    // =========================
-    // VẼ MÔ HÌNH
-    // =========================
-
-    renderer.render(
-      scene,
-      camera
-    );
+    // Vẽ mô hình
+    renderer.render(scene, camera);
 
   </script>
 
