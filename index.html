@@ -189,7 +189,81 @@
     scene.add(vong);
 
 
-    // Vẽ mô hình
+    // =========================
+    // B5 - TẠO CÁC TIA ÁNH SÁNG
+    // =========================
+
+    function taoTia(b, K, mau) {
+      let x = -110, z = b;     // vị trí xuất phát
+      let vx = 1, vz = 0;      // hướng bay: sang phải
+      const diem = [];
+
+      for (let i = 0; i < 400; i++) {
+
+        const r = Math.sqrt(x * x + z * z);
+
+        if (
+          r < RB + 5 ||
+          Math.abs(x) > 112 ||
+          Math.abs(z) > 112
+        ) break;
+
+        diem.push(
+          new THREE.Vector3(
+            x,
+            doCao(r) + 3,
+            z
+          )
+        );
+
+        const luc =
+          -K / Math.pow(r * r + 400, 1.5);
+
+        vx += luc * x * 1.2;
+        vz += luc * z * 1.2;
+
+        const dai =
+          Math.sqrt(vx * vx + vz * vz);
+
+        vx /= dai;
+        vz /= dai;
+
+        x += vx * 1.2;
+        z += vz * 1.2;
+      }
+
+      const duong =
+        new THREE.CatmullRomCurve3(diem);
+
+      const ong = new THREE.Mesh(
+        new THREE.TubeGeometry(
+          duong,
+          200,
+          0.8,
+          6
+        ),
+        new THREE.MeshBasicMaterial({
+          color: mau
+        })
+      );
+
+      scene.add(ong);
+
+      return duong;
+    }
+
+
+    const duongTia = [
+      taoTia(80, 12, 0xffe08a),  // tia xa
+      taoTia(60, 12, 0xffb347),  // tia trung bình
+      taoTia(40, 12, 0xff7a59)   // tia gần
+    ];
+
+
+    // =========================
+    // VẼ MÔ HÌNH
+    // =========================
+
     renderer.render(scene, camera);
 
   </script>
